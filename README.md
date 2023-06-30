@@ -21,4 +21,28 @@ Each player takes turns, and on their turn they draw a new card/tile and decide 
   - A bridge card cannot replace a land or water card if that card has a gnome AND that gnome is part of a group of "facing" gnomes.
   - If you replace a card with a bridge card, the other player must then use that replaced card on their turn instead of drawing a new card.
 
-Please note that the game still has some bugs in it. Additionally, the game does not have automatic scoring, yet.
+
+The game has 40 cards as follows:
+- 12 land cards without gnomes
+- 12 water cards without gnomes
+- 3 land cards with a land gnome on the path
+- 2 land cards with a water gnome on one of the water corners
+- 3 water cards with a water gnome on the stream
+- 2 water cards wtih a land gnome on one of the land corners
+- 3 cossack cards
+- 3 bridge cards
+These cards are placed into a random order at the beginning of every game.
+
+Using the `main` method in Java, you can play the game with default parameters or change them. Typing 
+
+`java Wege`
+
+should create a game with a 6x6 board and the 40 cards listed above. You can also change the size of the board and the cards in the deck.
+
+- `java Wege 7 5` should start a game with a 7x5 grid and the 40 cards listed. If the new grid has significantly more or fewer tiles than the standard 36, increase or decrease the number of land and water cards (without gnomes) so that there are the same number of road and water cards, but at least 2 more total cards than there are tiles in the game.
+- `java Wege 7 5 2` should start a game with a 7x5 grid, 2 cossack cards, 2 bridge cards, 2 of each water and land cards with gnomes on the path corners and gnomes on the non-path corners.
+- `java Wege 5` should start a game with a 6x6 grid and 5 each of the specialty cards (cossack cards, bridge cards, each variation of a card with a gnome).
+
+If you enter something other than realistic numbers, the code will display an error message.
+
+**_Please note that the game still has some bugs in it. Additionally, the game does not have automatic scoring, yet._**
