@@ -53,7 +53,7 @@ public class LLNode <T> {
     /**
      * Returns the length after this node to the end of the list
      * An example of structual recursion
-     * @ return the length of the list, after this node and not including this node
+     * @return the length of the list, after this node and not including this node
      */
     public int lengthFromHere() {
         if (getNext() == null)                      // this is the end of the list so 

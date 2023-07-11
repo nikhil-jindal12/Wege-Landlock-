@@ -20,6 +20,7 @@ public class LinkedList<T> implements Iterable<T> {
 
     /** 
      * Returns the first node
+     * @return the first node
      */
     protected LLNode<T> getFirstNode() {
         return firstNode;
@@ -43,6 +44,7 @@ public class LinkedList<T> implements Iterable<T> {
     
     /** 
      * Add an element to the front of the linked list
+     * @param element  the element to add to the front of the linked list
      */
     public void addToFront(T element) {
         setFirstNode(new LLNode<T>(element, getFirstNode()));

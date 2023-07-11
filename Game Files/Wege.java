@@ -13,7 +13,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 
-
 /**
  * Class that has the rules and GUI for the Wege game
  * @author Nikhil Jindal
@@ -140,6 +139,14 @@ public class Wege extends Application {
      */
     public static int getBridgeCard() {
         return bridgeCard;
+    }
+
+    /**
+     * Returns the nextCardbutton
+     * @return the nextCardbutton
+     */
+    public WegeButton getNextCard() {
+        return nextCard;
     }
 
     /**
@@ -342,6 +349,7 @@ public class Wege extends Application {
 
                 // rotate the card in the button if there is a card there
                 else {
+                    // nextCard.getCard().setOrientation(nextCard.getCard().rotate(nextCard.getCard().getOrientation()));
                     nextCard.rotate();
                 }
 
@@ -367,22 +375,22 @@ public class Wege extends Application {
     /**
      * class which runs the necessary actions if a button on the board is clicked
      */
-    public class ButtonAction implements EventHandler<ActionEvent> {
+    private class ButtonAction implements EventHandler<ActionEvent> {
 
         /** Stores the x-coordinate of the button that was clicked on the board */
-        public int buttonXPos;
+        private int buttonXPos;
 
         /** Stores the y-coordinate of the button that was clicked on the board */
-        public int buttonYPos;
+        private int buttonYPos;
 
         /** determines whether the move that the players wants to make is legal */
-        public boolean legalMove = true;
+        private boolean legalMove = true;
 
         /**
          * Returns the x-coordinate of the button that was clicked
          * @return the x-coordinate of the button that was clicked
          */
-        public int getButtonXPos() {
+        private int getButtonXPos() {
             return buttonXPos;
         }
 
@@ -390,15 +398,23 @@ public class Wege extends Application {
          * Returns the y-coordinate of the button that was clicked
          * @return the y-coordinate of the button that was clicked
          */
-        public int getButtonYPos() {
+        private int getButtonYPos() {
             return buttonYPos;
+        }
+
+        /**
+         * Returns whether the move that the players wants to make is legal
+         * @return whether the move that the players wants to make is legal
+         */
+        private boolean getLegalMove() {
+            return legalMove;
         }
 
         /**
          * Sets the x-coordinate of the button that was clicked
          * @param buttonXPos the x-coordinate of the button that was clicked
          */
-        public void setButtonXPos(int buttonXPos) {
+        private void setButtonXPos(int buttonXPos) {
             this.buttonXPos = buttonXPos;
         }
 
@@ -406,8 +422,16 @@ public class Wege extends Application {
          * Sets the y-coordinate of the button that was clicked
          * @param buttonYPos the y-coordinate of the button that was clicked
          */
-        public void setButtonYPos(int buttonYPos) {
+        private void setButtonYPos(int buttonYPos) {
             this.buttonYPos = buttonYPos;
+        }
+
+        /**
+         * Sets whether the move that the players wants to make is legal
+         * @param legalMove whether the move that the players wants to make is legal
+         */
+        private void setLegalMove(boolean legalMove) {
+            this.legalMove = legalMove;
         }
 
         /**
@@ -422,8 +446,11 @@ public class Wege extends Application {
             // return the position of the button that was clicked on the board
             getButtonPosition(button);
 
+            // set the indicator to be true at the beginning of every click
+            setLegalMove(true);
+
             // run the following actions if the card that is being played is a bridge card and is a legal move
-            if (nextCard.getCard().getCardType() == WegeCard.CardType.BRIDGE && isBridgeLegal() == true) {
+            if (nextCard.getCard().getCardType() == WegeCard.CardType.BRIDGE && isBridgeLegal() ) {
                 
                 // 1. create a temp variable to store the board card
                 WegeCard temp = button.getCard();
@@ -448,7 +475,7 @@ public class Wege extends Application {
             }
 
             // run the following actions if the button in the FlowPane has a card in it and is a legal move
-            else if (nextCard.getCard() != null && isLegal() == true) {
+            else if (nextCard.getCard() != null && isLegal()) {
                 
                 // 1. set the board button to be the same as the next card button
                 button.setCard(nextCard.getCard());
@@ -478,7 +505,7 @@ public class Wege extends Application {
          * finds the x and y-coordinate of the button that was clicked on the grid
          * @param button the reference to the actual button that was clicked
          */
-        public void getButtonPosition(WegeButton button) {
+        private void getButtonPosition(WegeButton button) {
 
             // scan the array to find which card corresponds
             for (int i = 0; i < getGridLength(); i++) {
@@ -496,7 +523,7 @@ public class Wege extends Application {
          * Checks to see if the move being made is legal or not
          * @return a boolean representing whether or not the move is legal
          */
-        public boolean isLegal() {
+        private boolean isLegal() {
 
             // make sure that at least one card has been played and that the button that was pressed does not have a card already
             if (cardsPlayed != 0 && gameBoard[getButtonXPos()][getButtonYPos()].getCard() == null) {
@@ -506,7 +533,7 @@ public class Wege extends Application {
                     
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
                     
                     // check left side
@@ -529,7 +556,7 @@ public class Wege extends Application {
                         checkAbove();
                     }
                     
-                    return legalMove;
+                    return getLegalMove();
                 }
 
                 // check card in top left corner of board
@@ -537,7 +564,7 @@ public class Wege extends Application {
                     
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
 
                     // check below
@@ -550,7 +577,7 @@ public class Wege extends Application {
                         checkRight();
                     }
 
-                    return legalMove;
+                    return getLegalMove();
 
                 }
 
@@ -559,7 +586,7 @@ public class Wege extends Application {
 
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
 
                     // check left side
@@ -572,7 +599,7 @@ public class Wege extends Application {
                         checkBelow();
                     }
 
-                    return legalMove;
+                    return getLegalMove();
 
                 }
 
@@ -581,7 +608,7 @@ public class Wege extends Application {
 
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
 
                     // check above
@@ -594,7 +621,7 @@ public class Wege extends Application {
                         checkRight();
                     }
 
-                    return legalMove;
+                    return getLegalMove();
 
                 }
 
@@ -603,7 +630,7 @@ public class Wege extends Application {
 
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
 
                     // check above
@@ -616,7 +643,7 @@ public class Wege extends Application {
                         checkLeft();
                     }
 
-                    return legalMove;
+                    return getLegalMove();
 
                 }
                 
@@ -625,7 +652,7 @@ public class Wege extends Application {
 
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
 
                     // check above
@@ -643,7 +670,7 @@ public class Wege extends Application {
                         checkRight();
                     }
 
-                    return legalMove;
+                    return getLegalMove();
 
                 }
 
@@ -652,7 +679,7 @@ public class Wege extends Application {
                     
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
 
                     // check above
@@ -670,7 +697,7 @@ public class Wege extends Application {
                         checkBelow();
                     }
 
-                    return legalMove;
+                    return getLegalMove();
 
                 }
                 
@@ -679,7 +706,7 @@ public class Wege extends Application {
 
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
 
                     // check left side
@@ -697,7 +724,7 @@ public class Wege extends Application {
                         checkRight();
                     }
 
-                    return legalMove;
+                    return getLegalMove();
 
                 }
 
@@ -706,7 +733,7 @@ public class Wege extends Application {
 
                     // check to see if there is a card around the button
                     if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() == null && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() == null) {
-                        legalMove = false;
+                        setLegalMove(false);
                     }
                     
                     // check above
@@ -724,15 +751,15 @@ public class Wege extends Application {
                         checkRight();
                     }
 
-                    return legalMove;
+                    return getLegalMove();
 
                 }
 
                 else {
 
                     // if none of the conditions are met, then this is not a legal move
-                    legalMove = false;
-                    return legalMove;
+                    setLegalMove(false);
+                    return getLegalMove();
 
                 }
 
@@ -741,15 +768,15 @@ public class Wege extends Application {
             // if no cards have been played yet, the move is legal
             else if (cardsPlayed == 0) {
 
-                return legalMove;
+                return getLegalMove();
 
             }
             
             // if none of the requirements are met, then the move is not legal
             else {
 
-                legalMove = false;
-                return legalMove;
+                setLegalMove(false);
+                return getLegalMove();
 
             }
 
@@ -759,7 +786,7 @@ public class Wege extends Application {
          * Checks to see if the move using a bridge card being made is legal 
          * @return a boolean representing whether or not the move is legal
          */
-        public boolean isBridgeLegal() {
+        private boolean isBridgeLegal() {
             /**
              * 1. return false if card to replace is cossack
              * 2. return false if replacing card with gnomes "facing" each other
@@ -1282,16 +1309,16 @@ public class Wege extends Application {
         /**
          * Check to see if the clicked card's bottom side matches the corners
          */
-        public void checkBelow() {
+        private void checkBelow() {
 
             // if the clicked card's bottom right corner and the card below it's corner don't match, then this is not a legal move
             if (!(gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isLand(Pos.TOP_RIGHT) == nextCard.getCard().isLand(Pos.BOTTOM_RIGHT) || gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isWater(Pos.TOP_RIGHT) == nextCard.getCard().isWater(Pos.BOTTOM_RIGHT))) {
-                legalMove = false;    
+                setLegalMove(false);   
             }
-
+            
             // if the clicked card's bottom left corner and the card below it's corner don't match, then this is not a legal move
             if (!(gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isLand(Pos.TOP_LEFT) == nextCard.getCard().isLand(Pos.BOTTOM_LEFT) || gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isWater(Pos.TOP_LEFT) == nextCard.getCard().isWater(Pos.BOTTOM_LEFT))) {
-                legalMove = false;
+                setLegalMove(false);  
             }
             
         }
@@ -1299,33 +1326,33 @@ public class Wege extends Application {
         /**
          * Check to see if the clicked card's top side matches the corners
          */
-        public void checkAbove() {
+        private void checkAbove() {
 
             // if the clicked card's top left corner and the card above it's corner don't match, then this is not a legal move
             if (!(gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isLand(Pos.BOTTOM_LEFT) == nextCard.getCard().isLand(Pos.TOP_LEFT) || gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isWater(Pos.BOTTOM_LEFT) == nextCard.getCard().isWater(Pos.TOP_LEFT))) {
-                legalMove = false;
+                setLegalMove(false);   
             }
-            
+                        
             // if the clicked card's top right corner and the card above it's corner don't match, then this is not a legal move
             if (!(gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isLand(Pos.BOTTOM_RIGHT) == nextCard.getCard().isLand(Pos.TOP_RIGHT) || gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isWater(Pos.BOTTOM_RIGHT) == nextCard.getCard().isWater(Pos.TOP_RIGHT))) {
-                legalMove = false;
+                setLegalMove(false);   
             }
-        
+            
         }
 
         /**
          * Check to see if the clicked card's left side matches the corners
          */
-        public void checkLeft() {
+        private void checkLeft() {
 
             // if the clicked card's top left corner and the card to its left's corner don't match, then this is not a legal move
             if (!(gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isLand(Pos.TOP_RIGHT) == nextCard.getCard().isLand(Pos.TOP_LEFT) || gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isWater(Pos.TOP_RIGHT) == nextCard.getCard().isWater(Pos.TOP_LEFT))) {
-                legalMove = false;
+                setLegalMove(false);   
             }
-
+        
             // if the clicked card's bottom left corner and the card to its left's corner don't match, then this is not a legal move
             if (!(gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isLand(Pos.BOTTOM_RIGHT) == nextCard.getCard().isLand(Pos.BOTTOM_LEFT) || gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isWater(Pos.BOTTOM_RIGHT) == nextCard.getCard().isWater(Pos.BOTTOM_LEFT))) {
-                legalMove = false;
+                setLegalMove(false);   
             }
             
         }
@@ -1333,16 +1360,16 @@ public class Wege extends Application {
         /**
          * Check to see if the clicked card's right side matches the corners 
          */
-        public void checkRight() {
+        private void checkRight() {
 
             // if the clicked card's top right corner and the card to its right's corner don't match, then this is not a legal move
             if (!(gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isLand(Pos.TOP_LEFT) == nextCard.getCard().isLand(Pos.TOP_RIGHT) || gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isWater(Pos.TOP_LEFT) == nextCard.getCard().isWater(Pos.TOP_RIGHT))) {
-                legalMove = false;
+                setLegalMove(false);   
             }
-
+            
             // if the clicked card's bottom right corner and the card to its right's corner don't match, then this is not a legal move
             if (!(gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isLand(Pos.BOTTOM_LEFT) == nextCard.getCard().isLand(Pos.BOTTOM_RIGHT) || gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isWater(Pos.BOTTOM_LEFT) == nextCard.getCard().isWater(Pos.BOTTOM_RIGHT))) {
-                legalMove = false;
+                setLegalMove(false);   
             }
             
         }
