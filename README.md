@@ -45,4 +45,4 @@ should create a game with a 6x6 board and the 40 cards listed above. You can als
 
 If you enter something other than realistic numbers, the code will display an error message.
 
-**_Please note that the game still has some bugs in it, mainly in relation to the bridge cards. Additionally, the game does not have automatic scoring, yet._**
+**_Bugs in relation to bridge cards and game rules have been fixed. Automatic scoring will be added shortly._**

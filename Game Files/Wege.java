@@ -349,7 +349,6 @@ public class Wege extends Application {
 
                 // rotate the card in the button if there is a card there
                 else {
-                    // nextCard.getCard().setOrientation(nextCard.getCard().rotate(nextCard.getCard().getOrientation()));
                     nextCard.rotate();
                 }
 
@@ -366,7 +365,8 @@ public class Wege extends Application {
             }
         }
 
-        // add the layout to the Scene, set the Stage, and display the Stage
+        // name the window, add the layout to the Scene, set the Stage, and display the Stage
+        primaryStage.setTitle("Wege (Landlock)");
         Scene scene = new Scene(layout);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -385,6 +385,9 @@ public class Wege extends Application {
 
         /** determines whether the move that the players wants to make is legal */
         private boolean legalMove = true;
+
+        /** determines how many gnomes are acing each other */
+        private int gnomeCount = 0;
 
         /**
          * Returns the x-coordinate of the button that was clicked
@@ -408,6 +411,14 @@ public class Wege extends Application {
          */
         private boolean getLegalMove() {
             return legalMove;
+        }
+
+        /**
+         * Returns the number of gnomes facing each other
+         * @return the number of gnomes facing each other
+         */
+        private int getGnomeCount() {
+            return gnomeCount;
         }
 
         /**
@@ -435,6 +446,14 @@ public class Wege extends Application {
         }
 
         /**
+         * Sets the number of gnomes facing each other
+         * @param gnomeCount the number of gnomes facing each other
+         */
+        private void setGnomeCount(int gnomeCount) {
+            this.gnomeCount = gnomeCount;
+        } 
+
+        /**
          * Overrides the handle method from EventHandler
          */
         @Override
@@ -449,8 +468,13 @@ public class Wege extends Application {
             // set the indicator to be true at the beginning of every click
             setLegalMove(true);
 
+            // do nothing if there is no card to play
+            if (nextCard.getCard() == null) {
+                // do nothing
+            }
+
             // run the following actions if the card that is being played is a bridge card and is a legal move
-            if (nextCard.getCard().getCardType() == WegeCard.CardType.BRIDGE && isBridgeLegal() ) {
+            else if (nextCard.getCard().getCardType() == WegeCard.CardType.BRIDGE && isBridgeLegal() ) {
                 
                 // 1. create a temp variable to store the board card
                 WegeCard temp = button.getCard();
@@ -458,10 +482,13 @@ public class Wege extends Application {
                 // 2. set the board card to be the nextCard
                 button.setCard(nextCard.getCard());
 
-                // 3. set the nextCard to be the saved card
+                // 3. keep the same orientation
+                button.setAlignment(nextCard.getCard().getOrientation());
+
+                // 4. set the nextCard to be the saved card
                 nextCard.setCard(temp);
 
-                // 4. change the turn indicator
+                // 5. change the turn indicator
                 if (cardsPlayed % 2 == 0) {
                     turnIndicator.setText("WATER's turn");
                 }
@@ -469,7 +496,7 @@ public class Wege extends Application {
                     turnIndicator.setText("LAND's turn");
                 }
 
-                // 5. increment the number of cards played
+                // 6. increment the number of cards played
                 cardsPlayed = cardsPlayed + 1;
 
             }
@@ -499,7 +526,13 @@ public class Wege extends Application {
 
             }
 
+            else {
+                // do nothing
+            }
+        
         }
+
+        
 
         /**
          * finds the x and y-coordinate of the button that was clicked on the grid
@@ -528,7 +561,7 @@ public class Wege extends Application {
             // make sure that at least one card has been played and that the button that was pressed does not have a card already
             if (cardsPlayed != 0 && gameBoard[getButtonXPos()][getButtonYPos()].getCard() == null) {
                 
-                // check cards not on the edge
+                // check cards not on the edge of the board
                 if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
                     
                     // check to see if there is a card around the button
@@ -537,26 +570,17 @@ public class Wege extends Application {
                     }
                     
                     // check left side
-                    if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null) {
-                        checkLeft();
-                    }
+                    checkLeft();
 
                     // check right
-                    if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null) {
-                        checkRight();
-                    }
+                    checkRight();
                 
                     // check below
-                    if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null) {
-                        checkBelow();
-                    }
+                    checkBelow();
 
                     // check above
-                    if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null) {
-                        checkAbove();
-                    }
+                    checkAbove();
                     
-                    return getLegalMove();
                 }
 
                 // check card in top left corner of board
@@ -568,16 +592,10 @@ public class Wege extends Application {
                     }
 
                     // check below
-                    if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null) {
-                        checkBelow();
-                    }
+                    checkBelow();
 
                     // check right
-                    if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null) {
-                        checkRight();
-                    }
-
-                    return getLegalMove();
+                    checkRight();
 
                 }
 
@@ -590,16 +608,10 @@ public class Wege extends Application {
                     }
 
                     // check left side
-                    if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null) {
-                        checkLeft();
-                    }
+                    checkLeft();
 
                     // check below
-                    if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null) {
-                        checkBelow();
-                    }
-
-                    return getLegalMove();
+                    checkBelow();
 
                 }
 
@@ -612,16 +624,10 @@ public class Wege extends Application {
                     }
 
                     // check above
-                    if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null) {
-                        checkAbove();
-                    }
+                    checkAbove();
 
                     // check right
-                    if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null) {
-                        checkRight();
-                    }
-
-                    return getLegalMove();
+                    checkRight();
 
                 }
 
@@ -634,16 +640,10 @@ public class Wege extends Application {
                     }
 
                     // check above
-                    if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null) {
-                        checkAbove();
-                    }
+                    checkAbove();
 
                     // check left side
-                    if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null) {
-                        checkLeft();
-                    }
-
-                    return getLegalMove();
+                    checkLeft();
 
                 }
                 
@@ -656,21 +656,13 @@ public class Wege extends Application {
                     }
 
                     // check above
-                    if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null) {
-                        checkAbove();
-                    }
+                    checkAbove();
 
                     // check below
-                    if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null) {
-                        checkBelow();
-                    }
+                    checkBelow();
 
                     // check right
-                    if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null) {
-                        checkRight();
-                    }
-
-                    return getLegalMove();
+                    checkRight();
 
                 }
 
@@ -683,21 +675,13 @@ public class Wege extends Application {
                     }
 
                     // check above
-                    if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null) {
-                        checkAbove();                        
-                    }
+                    checkAbove();
 
                     // check left side
-                    if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null) {
-                        checkLeft();
-                    }
+                    checkLeft();
 
                     // check below
-                    if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null) {
-                        checkBelow();
-                    }
-
-                    return getLegalMove();
+                    checkBelow();
 
                 }
                 
@@ -710,21 +694,13 @@ public class Wege extends Application {
                     }
 
                     // check left side
-                    if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null) {
-                        checkLeft();
-                    }
+                    checkLeft();
 
                     // check below
-                    if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null) {
-                        checkBelow();
-                    }
+                    checkBelow();
 
                     // check right
-                    if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null) {
-                        checkRight();
-                    }
-
-                    return getLegalMove();
+                    checkRight();
 
                 }
 
@@ -737,21 +713,13 @@ public class Wege extends Application {
                     }
                     
                     // check above
-                    if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null) {
-                        checkAbove();                        
-                    }
+                    checkAbove();
                     
                     // check left side
-                    if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null) {
-                        checkLeft();
-                    }
+                    checkLeft();
 
                     // check right
-                    if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null) {
-                        checkRight();
-                    }
-
-                    return getLegalMove();
+                    checkRight();
 
                 }
 
@@ -759,9 +727,10 @@ public class Wege extends Application {
 
                     // if none of the conditions are met, then this is not a legal move
                     setLegalMove(false);
-                    return getLegalMove();
 
                 }
+
+                return getLegalMove();
 
             }
 
@@ -787,6 +756,7 @@ public class Wege extends Application {
          * @return a boolean representing whether or not the move is legal
          */
         private boolean isBridgeLegal() {
+           
             /**
              * 1. return false if card to replace is cossack
              * 2. return false if replacing card with gnomes "facing" each other
@@ -803,524 +773,391 @@ public class Wege extends Application {
 
             // the move will always be not legal if it is trying to repace a cossack card
             else if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getCardType() == WegeCard.CardType.COSSACK) {
+                
                 return false;
+
             }
 
             // run the following code if the button pressed has a gnome on it
             else if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().hasGnome() == true) {
 
-                // check to see if the gnome is in the top left corner
-                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
+                // set that there is at least one gnome facing each other
+                setGnomeCount(1);
 
-                    // check card in center
-                    if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
+                // check cards not on the edge of the board
+                if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
+                
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeAbove();
+                    checkGnomeBelow();
+                    checkGnomeLeft();
+                    checkGnomeRight();
+                    checkGnomeLeftAbove();
+                    checkGnomeLeftBelow();
+                    checkGnomeRightAbove();
+                    checkGnomeRightBelow(); 
                     
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in top right corner of board
-                    else if (getButtonXPos() == getGridLength() - 1 && getButtonYPos() == 0) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in bottom left corner of board
-                    else if (getButtonXPos() == 0 && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in bottom right corner of board
-                    else if (getButtonXPos() == getGridLength() - 1 && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-                    
-                    // check cards on left edge
-                    else if (getButtonXPos() == 0 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check cards on right edge
-                    else if (getButtonXPos() == getGridLength() - 1 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-                    
-                    // check cards on top edge
-                    else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == 0) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check cards on bottom edge
-                    else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    return legalMove;
-            
                 }
-            
-                // check to see if the gnome is in the top right corner
-                else if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-            
-                    // check cards not on the edge
-                    if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in top left corner of board
-                    else if (getButtonXPos() == 0 && getButtonYPos() == 0) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in bottom left corner of board
-                    else if (getButtonXPos() == 0 && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in bottom right corner of board
-                    else if (getButtonXPos() == getGridLength() - 1 && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                    }
+                
+                // check card in top right corner of board
+                else if (getButtonXPos() == getGridLength() - 1 && getButtonYPos() == 0) {
                     
-                    // check cards on left edge
-                    else if (getButtonXPos() == 0 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check cards on right edge
-                    else if (getButtonXPos() == getGridLength() - 1 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                    }
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeLeft();
+                    checkGnomeBelow();
+                    checkGnomeLeftBelow();
                     
-                    // check cards on top edge
-                    else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == 0) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check cards on bottom edge
-                    else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    return legalMove;
-            
                 }
-            
-                // check to see if the gnome is in the bottom left corner
-                else if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-            
-                    // check cards not on the edge
-                    if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in top left corner of board
-                    else if (getButtonXPos() == 0 && getButtonYPos() == 0) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in top right corner of board
-                    else if (getButtonXPos() == getGridLength() - 1 && getButtonYPos() == 0) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in bottom right corner of board
-                    else if (getButtonXPos() == getGridLength() - 1 && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                    }
+
+                // check card in the top left corner of the board
+                else if (getButtonXPos() == 0 && getButtonYPos() == 0) {
                     
-                    // check cards on left edge
-                    else if (getButtonXPos() == 0 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check cards on right edge
-                    else if (getButtonXPos() == getGridLength() - 1 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeRight();
+                    checkGnomeBelow();
+                    checkGnomeRightBelow();
                     
-                    // check cards on top edge
-                    else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == 0) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check cards on bottom edge
-                    else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    return legalMove;
-            
                 }
-            
-                // check to see if there is a gnome in the bottom right corner
+                
+                // check card in bottom left corner of board
+                else if (getButtonXPos() == 0 && getButtonYPos() == getGridHeight() - 1) {
+                    
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeAbove();
+                    checkGnomeRight();
+                    checkGnomeRightAbove();
+                    
+                }
+                
+                // check card in bottom right corner of board
+                else if (getButtonXPos() == getGridLength() - 1 && getButtonYPos() == getGridHeight() - 1) {
+                    
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeAbove();
+                    checkGnomeLeft();
+                    checkGnomeLeftAbove();
+                    
+                }
+                
+                // check cards on left edge
+                else if (getButtonXPos() == 0 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
+        
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeAbove();
+                    checkGnomeBelow();
+                    checkGnomeRight();
+                    checkGnomeRightAbove();
+                    checkGnomeRightBelow();
+                    
+                }
+        
+                // check cards on right edge
+                else if (getButtonXPos() == getGridLength() - 1 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
+                    
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeAbove();
+                    checkGnomeBelow();
+                    checkGnomeLeft();
+                    checkGnomeLeftAbove();
+                    checkGnomeLeftBelow();
+                    
+                }
+                
+                // check cards on top edge
+                else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == 0) {
+                    
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeLeft();
+                    checkGnomeRight();
+                    checkGnomeBelow();
+                    checkGnomeRightBelow();
+                    checkGnomeLeftBelow();
+                    
+                }
+                
+                // check cards on bottom edge
+                else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == getGridHeight() - 1) {
+                    
+                    // check to see if there is a gnome at the intersection
+                    checkGnomeLeft();
+                    checkGnomeRight();
+                    checkGnomeAbove();
+                    checkGnomeRightAbove();
+                    checkGnomeLeftAbove();
+                    
+                }
+                
+                // run the following code if there is only 1 gnome at the intersection
+                if (getGnomeCount() == 1) {
+                    WegeCard temp = gameBoard[getButtonXPos()][getButtonYPos()].getCard();
+                    gameBoard[getButtonXPos()][getButtonYPos()].setCard(null);
+                    boolean result = isLegal();
+                    gameBoard[getButtonXPos()][getButtonYPos()].setCard(temp);
+                    return result;
+                }
+                
+                // run the following code if there are 2+ gnomes at the intersection
                 else {
-            
-                    // check cards not on the edge
-                    if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-                        
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in top left corner of board
-                    else if (getButtonXPos() == 0 && getButtonYPos() == 0) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-                        
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in top right corner of board
-                    else if (getButtonXPos() == getGridLength() - 1 && getButtonYPos() == 0) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check card in bottom left corner of board
-                    else if (getButtonXPos() == 0 && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-                    
-                    // check cards on left edge
-                    else if (getButtonXPos() == 0 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-                        
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check cards on right edge
-                    else if (getButtonXPos() == getGridLength() - 1 && (getButtonYPos() > 0 && getButtonYPos() < getGridHeight() - 1)) {
-                        
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-            
-                    }
-                    
-                    // check cards on top edge
-                    else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == 0) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                        if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
-                            return false;
-                        }
-                        
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    // check cards on bottom edge
-                    else if ((getButtonXPos() > 0 && getButtonXPos() < getGridLength() - 1) && getButtonYPos() == getGridHeight() - 1) {
-            
-                        // check to see if there is a gnome at the intersection
-                        if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome() == true && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
-                            return false;
-                        }
-            
-                    }
-            
-                    return legalMove;
-            
+                    return getLegalMove();
                 }
-
+                
             }
-
-            // if none of the conditions are met, then run the following code
+            
+            // run the following code if the button pressed does not have a gnome on it
             else {
+                WegeCard temp = gameBoard[getButtonXPos()][getButtonYPos()].getCard();
+                gameBoard[getButtonXPos()][getButtonYPos()].setCard(null);
+                boolean result = isLegal();
+                gameBoard[getButtonXPos()][getButtonYPos()].setCard(temp);
+                return result;
+            }
+            
+        }
+        
+        /**
+         * Checks the card to the right to see if there is an adjacent gnome for the current card
+         * Method will change an indicator if the move is not legal
+         */
+        private void checkGnomeRight() {
+            
+            // only check if there is a card exists and it has a gnome
+            if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null && gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().hasGnome()) {
+                
+                // check if there is an adjacent gnome when the current card's gnome is in the top right
+                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
+                    
+                    if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
 
-                // check to see if there is a card around the button that was clicked at all
-                if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null) {
-                    return legalMove;
                 }
 
-                else if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null) {
-                    return legalMove;
+                // check is there is an adjacent gnome when the current card's gnome is in the bottom right
+                else if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
+                    
+                    if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+                
+            }
+            
+        }
+        
+        /**
+         * Checks the card to the left to see if there is an adjacent gnome for the current card
+         * Method will change an indicator if the move is not legal
+         */
+        private void checkGnomeLeft() {
+            
+            // only check if a card exists and it has a gnome
+            if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null && gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().hasGnome()) {
+                
+                // check if there is an adjacent gnome when the current card's gnome is in the top left
+                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
+                    
+                    if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
                 }
 
-                else if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null) {
-                    return legalMove;
-                }
+                // check if there is an adjacent gnome when the current card's gnome is in the bottom left
+                else if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
+                    
+                    if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
 
-                else if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null) {
-                    return legalMove;
-                }
-
-                else {
-                    return !legalMove;
                 }
 
             }
+
         }
+
+        /**
+         * Checks the above card to see if there is an adjacent gnome for the current card
+         * Method will change an indicator if the move is not legal
+         */
+        private void checkGnomeAbove() {
+            
+            // only check if a card exists and it has a gnome
+            if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null && gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().hasGnome()) {
+
+                // check if there is an adjacent gnome when the current card's gnome is in the top left
+                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
+                    
+                    if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+
+                // check if there is an adjacent gnome when the current card's gnome is in the top right
+                else if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
+                    
+                    if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+
+            }
+
+        }
+
+        /**
+         * Checks the below card to see if there is an adjacent gnome for the current card
+         * Method will change an indicator if the move is not legal
+         */
+        private void checkGnomeBelow() {
+
+            // only check if a card exists and it has a gnome
+            if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null && gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().hasGnome()) {
+
+                // check if there is an adjacent gnome when the current card's gnome is in the bottom left
+                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
+                    
+                    if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+
+                // check if there is an adjacent gnome when the current card's gnome is in the bottom right
+                else if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
+                    
+                    if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+
+            }
+
+        }
+
+        /**
+         * Checks the card to the left and above to see if there is an adjacent gnome for the current card
+         * Method will change an indicator if the move is not legal
+         */
+        private void checkGnomeLeftAbove() {
+
+            // only check if a card exists and it has a gnome
+            if (gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard() != null && gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard().hasGnome()) {
+
+                // check if there is a diagonal gnome when the gnome's current position is in the top left
+                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_LEFT) {
+                    
+                    if (gameBoard[getButtonXPos() - 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+
+            }            
+            
+        }
+
+        /**
+         * Checks the card to the left and below to see if there is an adjacent gnome for the current card
+         * Method will change an indicator if the move is not legal
+         */
+        private void checkGnomeLeftBelow() {
+
+            // only check if a card exists and it has a gnome
+            if (gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard() != null && gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().hasGnome()) {
+
+                // check if there is a diagonal gnome when the gnome's current position is in the bottom left
+                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
+                    
+                    if (gameBoard[getButtonXPos() - 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+
+            }  
+
+        }
+
+        /**
+         * Checks the card to the right and above to see if there is an adjacent gnome for the current card
+         * Method will change an indicator if the move is not legal
+         */
+        private void checkGnomeRightAbove() {
+
+            // only check if a card exists and it has a gnome
+            if (gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard() != null && gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().hasGnome()) {
+
+                // check if there is a diagonal gnome when the gnome's current position is in the top right
+                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.TOP_RIGHT) {
+
+                    if (gameBoard[getButtonXPos() + 1][getButtonYPos() - 1].getCard().getGnomePosition() == Pos.BOTTOM_LEFT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+
+            } 
+
+        }
+
+        /**
+         * Checks the card to the right and below to see if there is an adjacent gnome for the current card
+         * Method will change an indicator if the move is not legal
+         */
+        private void checkGnomeRightBelow() {
+
+            // only check if a card exists and it has a gnome
+            if (gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard() != null && gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().hasGnome()) {
+
+                // check if there is a diagonal gnome when the gnome's current position is in the bottom right
+                if (gameBoard[getButtonXPos()][getButtonYPos()].getCard().getGnomePosition() == Pos.BOTTOM_RIGHT) {
+                   
+                    if (gameBoard[getButtonXPos() + 1][getButtonYPos() + 1].getCard().getGnomePosition() == Pos.TOP_LEFT) {
+                        setLegalMove(false);
+                        setGnomeCount(getGnomeCount() + 1);
+                    }
+
+                }
+
+            } 
+
+        }       
 
         /**
          * Check to see if the clicked card's bottom side matches the corners
          */
         private void checkBelow() {
 
-            // if the clicked card's bottom right corner and the card below it's corner don't match, then this is not a legal move
-            if (!(gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isLand(Pos.TOP_RIGHT) == nextCard.getCard().isLand(Pos.BOTTOM_RIGHT) || gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isWater(Pos.TOP_RIGHT) == nextCard.getCard().isWater(Pos.BOTTOM_RIGHT))) {
-                setLegalMove(false);   
-            }
+            // only check if the adjacent card exists
+            if (gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard() != null) {
+                
+                // if the clicked card's bottom right corner and the card below it's corner don't match, then this is not a legal move
+                if (!(gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isLand(Pos.TOP_RIGHT) == nextCard.getCard().isLand(Pos.BOTTOM_RIGHT) || gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isWater(Pos.TOP_RIGHT) == nextCard.getCard().isWater(Pos.BOTTOM_RIGHT))) {
+                    setLegalMove(false);   
+                }
+                
+                // if the clicked card's bottom left corner and the card below it's corner don't match, then this is not a legal move
+                if (!(gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isLand(Pos.TOP_LEFT) == nextCard.getCard().isLand(Pos.BOTTOM_LEFT) || gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isWater(Pos.TOP_LEFT) == nextCard.getCard().isWater(Pos.BOTTOM_LEFT))) {
+                    setLegalMove(false);  
+                }
             
-            // if the clicked card's bottom left corner and the card below it's corner don't match, then this is not a legal move
-            if (!(gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isLand(Pos.TOP_LEFT) == nextCard.getCard().isLand(Pos.BOTTOM_LEFT) || gameBoard[getButtonXPos()][getButtonYPos() + 1].getCard().isWater(Pos.TOP_LEFT) == nextCard.getCard().isWater(Pos.BOTTOM_LEFT))) {
-                setLegalMove(false);  
             }
-            
+
         }
 
         /**
@@ -1328,14 +1165,19 @@ public class Wege extends Application {
          */
         private void checkAbove() {
 
-            // if the clicked card's top left corner and the card above it's corner don't match, then this is not a legal move
-            if (!(gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isLand(Pos.BOTTOM_LEFT) == nextCard.getCard().isLand(Pos.TOP_LEFT) || gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isWater(Pos.BOTTOM_LEFT) == nextCard.getCard().isWater(Pos.TOP_LEFT))) {
-                setLegalMove(false);   
-            }
-                        
-            // if the clicked card's top right corner and the card above it's corner don't match, then this is not a legal move
-            if (!(gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isLand(Pos.BOTTOM_RIGHT) == nextCard.getCard().isLand(Pos.TOP_RIGHT) || gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isWater(Pos.BOTTOM_RIGHT) == nextCard.getCard().isWater(Pos.TOP_RIGHT))) {
-                setLegalMove(false);   
+            // only check if the adjacent card exists
+            if (gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard() != null) {
+                
+                // if the clicked card's top left corner and the card above it's corner don't match, then this is not a legal move
+                if (!(gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isLand(Pos.BOTTOM_LEFT) == nextCard.getCard().isLand(Pos.TOP_LEFT) || gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isWater(Pos.BOTTOM_LEFT) == nextCard.getCard().isWater(Pos.TOP_LEFT))) {
+                    setLegalMove(false);   
+                }
+                            
+                // if the clicked card's top right corner and the card above it's corner don't match, then this is not a legal move
+                if (!(gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isLand(Pos.BOTTOM_RIGHT) == nextCard.getCard().isLand(Pos.TOP_RIGHT) || gameBoard[getButtonXPos()][getButtonYPos() - 1].getCard().isWater(Pos.BOTTOM_RIGHT) == nextCard.getCard().isWater(Pos.TOP_RIGHT))) {
+                    setLegalMove(false);   
+                }
+
             }
             
         }
@@ -1345,14 +1187,19 @@ public class Wege extends Application {
          */
         private void checkLeft() {
 
-            // if the clicked card's top left corner and the card to its left's corner don't match, then this is not a legal move
-            if (!(gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isLand(Pos.TOP_RIGHT) == nextCard.getCard().isLand(Pos.TOP_LEFT) || gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isWater(Pos.TOP_RIGHT) == nextCard.getCard().isWater(Pos.TOP_LEFT))) {
-                setLegalMove(false);   
-            }
-        
-            // if the clicked card's bottom left corner and the card to its left's corner don't match, then this is not a legal move
-            if (!(gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isLand(Pos.BOTTOM_RIGHT) == nextCard.getCard().isLand(Pos.BOTTOM_LEFT) || gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isWater(Pos.BOTTOM_RIGHT) == nextCard.getCard().isWater(Pos.BOTTOM_LEFT))) {
-                setLegalMove(false);   
+            // only check if the adjacent card exists
+            if (gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard() != null) {
+
+                // if the clicked card's top left corner and the card to its left's corner don't match, then this is not a legal move
+                if (!(gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isLand(Pos.TOP_RIGHT) == nextCard.getCard().isLand(Pos.TOP_LEFT) || gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isWater(Pos.TOP_RIGHT) == nextCard.getCard().isWater(Pos.TOP_LEFT))) {
+                    setLegalMove(false);   
+                }
+            
+                // if the clicked card's bottom left corner and the card to its left's corner don't match, then this is not a legal move
+                if (!(gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isLand(Pos.BOTTOM_RIGHT) == nextCard.getCard().isLand(Pos.BOTTOM_LEFT) || gameBoard[getButtonXPos() - 1][getButtonYPos()].getCard().isWater(Pos.BOTTOM_RIGHT) == nextCard.getCard().isWater(Pos.BOTTOM_LEFT))) {
+                    setLegalMove(false);   
+                }
+            
             }
             
         }
@@ -1362,14 +1209,19 @@ public class Wege extends Application {
          */
         private void checkRight() {
 
-            // if the clicked card's top right corner and the card to its right's corner don't match, then this is not a legal move
-            if (!(gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isLand(Pos.TOP_LEFT) == nextCard.getCard().isLand(Pos.TOP_RIGHT) || gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isWater(Pos.TOP_LEFT) == nextCard.getCard().isWater(Pos.TOP_RIGHT))) {
-                setLegalMove(false);   
-            }
-            
-            // if the clicked card's bottom right corner and the card to its right's corner don't match, then this is not a legal move
-            if (!(gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isLand(Pos.BOTTOM_LEFT) == nextCard.getCard().isLand(Pos.BOTTOM_RIGHT) || gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isWater(Pos.BOTTOM_LEFT) == nextCard.getCard().isWater(Pos.BOTTOM_RIGHT))) {
-                setLegalMove(false);   
+            // only check if the adjacent card exists
+            if (gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard() != null) {
+
+                // if the clicked card's top right corner and the card to its right's corner don't match, then this is not a legal move
+                if (!(gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isLand(Pos.TOP_LEFT) == nextCard.getCard().isLand(Pos.TOP_RIGHT) || gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isWater(Pos.TOP_LEFT) == nextCard.getCard().isWater(Pos.TOP_RIGHT))) {
+                    setLegalMove(false);   
+                }
+                
+                // if the clicked card's bottom right corner and the card to its right's corner don't match, then this is not a legal move
+                if (!(gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isLand(Pos.BOTTOM_LEFT) == nextCard.getCard().isLand(Pos.BOTTOM_RIGHT) || gameBoard[getButtonXPos() + 1][getButtonYPos()].getCard().isWater(Pos.BOTTOM_LEFT) == nextCard.getCard().isWater(Pos.BOTTOM_RIGHT))) {
+                    setLegalMove(false);   
+                }
+
             }
             
         }
